@@ -1,0 +1,9 @@
+public class Main {
+  public static void main(String[] args) {
+    Pattern pattern = Pattern.compile("[^0-9]");
+    Matcher matcher = pattern.matcher(args);
+    while (matcher.find()) {
+      System.out.println(args.substring(matcher.start(), matcher.end()));
+    }
+  }
+}
