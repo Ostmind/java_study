@@ -6,15 +6,10 @@ public class Main {
     static Pattern pattern = Pattern.compile("[0-9]+");
     
     public static void main(String[] args) {
-        if (args[0] != "")
+        if (args.length > 0)
         {
             int sum = 0;
-            String text = "";
-            for (int i = 0; i < args.length; i++)
-            {
-                text += args[i];
-            }
-            Matcher matcher = pattern.matcher(text);
+            Matcher matcher = pattern.matcher(args[0]);
             while (matcher.find()) {
                 sum += Integer.parseInt(matcher.group());
             }
