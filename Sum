@@ -1,12 +1,14 @@
 public class Main {
   static Pattern pattern = Pattern.compile("[0-9]+");
   public static void main(String[] args) {
-    //проверка на сущ-ие строки
-    int sum = 0;
-    Matcher matcher = pattern.matcher(args[0]);
-    while (matcher.find()) {
-      sum += Integer.parseInt(matcher.group());
+    if (args[0] != '')
+    {
+      int sum = 0;
+      Matcher matcher = pattern.matcher(args[0]);
+      while (matcher.find()) {
+        sum += Integer.parseInt(matcher.group());
+      }
+     System.out.println(sum);
     }
-  //вывод
   }
 }
