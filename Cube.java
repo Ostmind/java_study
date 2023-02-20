@@ -1,3 +1,4 @@
+
 public class Cube extends Geometry {
     private static final String NAME = "Cube";
 
@@ -30,9 +31,11 @@ public class Cube extends Geometry {
         return mass;
     }
 
-    @Override
-    public double getDensity() {
-        double density = (edge * edge * edge) / mass ;
-        return density;
+    public double getArea(){
+        return edge * edge * edge;
+    }
+
+    public void getDensity() {
+        System.out.println(getName() + ": density = " + (getArea() / mass));
     }
 }
