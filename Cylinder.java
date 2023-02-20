@@ -40,9 +40,11 @@ public class Cylinder extends Geometry {
         return mass;
     }
 
-    @Override
-    public double getDensity() {
-        double density = (Math.PI * radius * radius * height) / mass;
-        return density;
+    public double getArea(){
+        return Math.PI * radius * radius * height;
+    }
+
+    public void getDensity() {
+        System.out.println(getName() + ": density = " + (getArea() / mass));
     }
 }
