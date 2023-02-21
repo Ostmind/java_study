@@ -1,14 +1,15 @@
 public class Cylinder extends Geometry {
+
     private static final String NAME = "Cylinder";
 
     private double radius;
+    
     private double height;
-    private double mass;
 
     public Cylinder(double radius, double height, double mass) {
+        super(mass);
         this.radius = radius;
         this.height = height;
-        this.mass = mass;
     }
 
     @Override
@@ -32,19 +33,9 @@ public class Cylinder extends Geometry {
         this.height = height;
     }
 
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-
-    public double getMass(double mass) {
-        return mass;
-    }
-
+    @Override
     public double getArea(){
         return Math.PI * radius * radius * height;
     }
-
-    public void getDensity() {
-        System.out.println(getName() + ": density = " + (mass / getArea()));
-    }
+    
 }
