@@ -1,13 +1,13 @@
 
 public class Cube extends Geometry {
+    
     private static final String NAME = "Cube";
 
     private double edge;
-    private double mass;
 
     public Cube(double edge, double mass) {
+        super(mass);
         this.edge = edge;
-        this.mass = mass;
     }
 
     @Override
@@ -22,20 +22,9 @@ public class Cube extends Geometry {
     public double getEdge(double edge) {
         return edge;
     }
-
-    public void setMass(double mass) {
-        this.edge = mass;
-    }
-
-    public double getMass(double mass) {
-        return mass;
-    }
-
+    @Override
     public double getArea(){
         return edge * edge * edge;
     }
 
-    public void getDensity() {
-        System.out.println(getName() + ": density = " + (mass / getArea()));
-    }
 }
