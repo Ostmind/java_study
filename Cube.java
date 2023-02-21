@@ -36,6 +36,6 @@ public class Cube extends Geometry {
     }
 
     public void getDensity() {
-        System.out.println(getName() + ": density = " + (getArea() / mass));
+        System.out.println(getName() + ": density = " + (mass / getArea()));
     }
 }
