@@ -4,10 +4,12 @@ public abstract class Geometry {
     public Geometry (double mass){
         this.mass = mass;
     }
+    
     public abstract String getName();
 
     public double getDensity(){
         return mass / getArea();
     };
+    
     public abstract double getArea ();
 }
