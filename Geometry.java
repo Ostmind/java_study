@@ -1,4 +1,5 @@
 public abstract class Geometry {
+    
     private double mass;
 
     public Geometry (double mass){
