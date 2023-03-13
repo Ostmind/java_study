@@ -22,10 +22,10 @@ public class Main {
         for (Geometry geom : geometry)
             System.out.println(geom.getName() + ": density = " + geom.getDensity());
         System.out.println("Sorting");
-        while(!isSorted) { //Внешний цикл
+        while(!isSorted) { 
             isSorted = true;
-            for (int in = 0; in < geometry.size()-1; in++) {       //Внутренний цикл
-                if (geometry.get(in).getDensity() > geometry.get(in + 1).getDensity()) {
+            for (int in = 0; in < geometry.size()-1; in++) {       
+                if (geometry.get(in).getDensity() < geometry.get(in + 1).getDensity()) {
                     isSorted = false;
                     Collections.swap(geometry, in, in + 1);
                 }
