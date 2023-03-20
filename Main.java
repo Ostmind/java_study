@@ -22,9 +22,11 @@ class ProcessingThread implements Runnable {
     @Override
     public void run() {
         while (res.counter <= 100) {
-            synchronized(res) {
-             res.increment();
+             synchronized(res) {
+              res.increment();
+             }
              System.out.println(Thread.currentThread().getName() + " " + res.counter);
+             synchronized(lock) {
              if (res.counter == 100)
              {
               
