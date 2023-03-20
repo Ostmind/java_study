@@ -18,7 +18,7 @@ class ProcessingThread implements Runnable {
     {
         this.res = res;
     }    
-    private static final Object lock = new Object();
+    
     @Override
     public void run() {
         while (res.counter <= 100) {
@@ -26,7 +26,7 @@ class ProcessingThread implements Runnable {
               res.increment();
              }
              System.out.println(Thread.currentThread().getName() + " " + res.counter);
-             synchronized(lock) {
+             synchronized(res) {
              if (res.counter == 100)
              {
               
