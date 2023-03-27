@@ -1,9 +1,4 @@
-import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import java.util.concurrent.*;
 
 public class Main
 {
@@ -13,41 +8,37 @@ public class Main
 
     public static class Plane implements Runnable
     {
-        private int planeNum;
-        private static final LinkedList<Integer> controlStrip = new LinkedList<>();
+        private final int planeNum;
+        private static final LinkedBlockingQueue<Integer> controlStrip = new LinkedBlockingQueue<>();
         public Plane(int planeNum)  {
+
             this.planeNum = planeNum;
         }
         public static void setControlStrip(){
             for (int i =0;i<countStrip;i+=1)
             controlStrip.add(i);
         }
-        public static Integer getControlStrip(){
-            return controlStrip.removeFirst();
-        }
-        public static void setStrip(int i){
-            controlStrip.addLast(i);
-        }
         @Override
         public void run() {
             try {
                 // Запрос разрешения
                 semaphore.acquire();
-                int controlNum = getControlStrip();
+                int controlNum = controlStrip.take();
                 System.out.println("Самолет "+planeNum+" выруливает на полосу "+controlNum);
                 System.out.println("Полоса "+controlNum+" приняла самолет "+planeNum);
                 // взлетаем
                 TimeUnit.SECONDS.sleep(1);
                 System.out.println("Самолет " + planeNum + " взлетел");
                 // Освобождение полосы
-                setStrip(controlNum);
+                controlStrip.add(controlNum);
                 System.out.println("Полоса " + controlNum + " освободилась");
                 semaphore.release();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
     public static void main(String[] args)
-            throws InterruptedException
     {
         semaphore = new Semaphore(countStrip,
                 true);
@@ -58,7 +49,7 @@ public class Main
             executor.execute(worker);
         }
         executor.shutdown();
-        while (!executor.isTerminated()) {   }
+        while (!executor.isTerminated()) { }
         System.out.println("Все самолеты взлетели");
     }
 }
