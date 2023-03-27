@@ -52,8 +52,7 @@ public class Main {
                 executor.execute(worker);
             }
             executor.shutdown();
-            while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)) {
-            }
+            while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)) { }
             System.out.println("Все самолеты взлетели");
 
         } catch (InterruptedException e) {
