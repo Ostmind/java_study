@@ -1,5 +1,7 @@
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main
 {
@@ -57,10 +59,13 @@ public class Main
             controlStrip[i] = true;
         semaphore = new Semaphore(controlStrip.length,
                 true);
-
+        ExecutorService executor = Executors.newFixedThreadPool(countPlanes);
         for (int i = 1; i <= countPlanes; i++) {
-            new Thread(new Plane(i)).start();
+            Runnable worker = new Plane(i);
+            executor.execute(worker);
         }
+        executor.shutdown();
+        while (!executor.isTerminated()) {   }
+        System.out.println("Все самолеты взлетели");
     }
 }
-
