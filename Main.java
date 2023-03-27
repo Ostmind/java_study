@@ -1,31 +1,32 @@
 import java.util.concurrent.*;
 
-public class Main
-{
-    private static final int countStrip = 5; // кол-во полос
-    private static final int countPlanes = 10; // кол-во самолетов
+public class Main {
+    private static final int COUNT_STRIP = 5; // кол-во полос
+    private static final int COUNT_PLANES = 10; // кол-во самолетов
     private static Semaphore semaphore = null;
 
-    public static class Plane implements Runnable
-    {
+    public static class Plane implements Runnable {
         private final int planeNum;
         private static final LinkedBlockingQueue<Integer> controlStrip = new LinkedBlockingQueue<>();
-        public Plane(int planeNum)  {
+
+        public Plane(int planeNum) {
 
             this.planeNum = planeNum;
         }
-        public static void setControlStrip(){
-            for (int i =0;i<countStrip;i+=1)
-            controlStrip.add(i);
+
+        public static void setControlStrip() {
+            for (int i = 0; i < COUNT_STRIP; i += 1)
+                controlStrip.add(i);
         }
+
         @Override
         public void run() {
             try {
                 // Запрос разрешения
                 semaphore.acquire();
                 int controlNum = controlStrip.take();
-                System.out.println("Самолет "+planeNum+" выруливает на полосу "+controlNum);
-                System.out.println("Полоса "+controlNum+" приняла самолет "+planeNum);
+                System.out.println("Самолет " + planeNum + " выруливает на полосу " + controlNum);
+                System.out.println("Полоса " + controlNum + " приняла самолет " + planeNum);
                 // взлетаем
                 TimeUnit.SECONDS.sleep(1);
                 System.out.println("Самолет " + planeNum + " взлетел");
@@ -35,21 +36,29 @@ public class Main
                 semaphore.release();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                System.err.print("Critical Thread Error");
             }
         }
     }
-    public static void main(String[] args)
-    {
-        semaphore = new Semaphore(countStrip,
-                true);
-        Plane.setControlStrip();//Первоначальное заполнение всех полос
-        ExecutorService executor = Executors.newFixedThreadPool(countPlanes);
-        for (int i = 1; i <= countPlanes; i++) {
-            Runnable worker = new Plane(i);
-            executor.execute(worker);
+
+    public static void main(String[] args) {
+        try {
+            semaphore = new Semaphore(COUNT_STRIP,
+                    true);
+            Plane.setControlStrip();//Первоначальное заполнение всех полос
+            ExecutorService executor = Executors.newFixedThreadPool(COUNT_PLANES);
+            for (int i = 1; i <= COUNT_PLANES; i++) {
+                Runnable worker = new Plane(i);
+                executor.execute(worker);
+            }
+            executor.shutdown();
+            while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)) {
+            }
+            System.out.println("Все самолеты взлетели");
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.print("Critical Program Error");
         }
-        executor.shutdown();
-        while (!executor.isTerminated()) { }
-        System.out.println("Все самолеты взлетели");
     }
 }
