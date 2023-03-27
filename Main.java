@@ -1,71 +1,71 @@
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-public class Main
+class CounterObject
 {
-    private static final int countStrip = 5;
-    private static final int countPlanes = 10;
-    // Флаги мест контроля
-    private static boolean[] controlStrip = null;
+    
+    private static volatile Integer counter = 0;
+    
+    private CounterObject(){}
+    
+    public static Integer increment() {    
+     synchronized(CounterObject.class){
+     counter+=1;
+     return counter;
+     }
+    }
+    
+    public static Integer getCounter() {
+     return counter;
+    }
+    
+    public static void decrement() {
+     counter -=1;
+    }
+}
 
-    private static Semaphore semaphore = null;
+class ProcessingThread implements Runnable {
 
-    public static class Plane implements Runnable
-    {
-        private int planeNum;
-
-        public Plane(int planeNum)  {
-            this.planeNum = planeNum;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // Запрос разрешения
-                semaphore.acquire();
-                int controlNum = -1;
-                synchronized (controlStrip){
-                    for (int i = 0;
-                         i < countStrip; i++)
-                        if (controlStrip[i]) {
-                            // Занимаем место
-                            controlStrip[i] = false;
-                            controlNum = i;
-                            System.out.println("Самолет "+planeNum+" выруливает на полосу "+i);
-                            System.out.println("Полоса "+i+" приняла самолет "+planeNum);
-                            break;
-                        }
-                }
-
-                // взлетаем
-                TimeUnit.SECONDS.sleep(1);
-                System.out.println("Самолет " + planeNum + " взлетел");
-                // Освобождение полосы
-                synchronized (controlStrip) {
-                    controlStrip[controlNum] = true;
-                }
-                System.out.println("Полоса " + controlNum + " освободилась");
-                semaphore.release();
-            } catch (InterruptedException e) {}
+    
+    private static final Object lock = new Object();
+    
+    @Override
+    public void run() {
+        while (CounterObject.getCounter() <= 100) {
+             
+             Integer increment = CounterObject.increment();
+             synchronized(lock) {
+             if (increment == 100)
+             {
+              
+              try {
+               lock.wait();
+              }
+              catch (InterruptedException e) {}
+              System.out.println("I'm winner " + Thread.currentThread().getName());
+              
+             }
+             if (increment > 100)
+             {
+              System.out.println("I'm late.... " + Thread.currentThread().getName());
+              lock.notify();
+              
+             }
+          
+            }
         }
     }
-    public static void main(String[] args)
-            throws InterruptedException
-    {
-        controlStrip = new boolean[countStrip];
-        for (int i = 0; i < countStrip; i++)
-            controlStrip[i] = true;
-        semaphore = new Semaphore(controlStrip.length,
-                true);
-        ExecutorService executor = Executors.newFixedThreadPool(countPlanes);
-        for (int i = 1; i <= countPlanes; i++) {
-            Runnable worker = new Plane(i);
-            executor.execute(worker);
-        }
-        executor.shutdown();
-        while (!executor.isTerminated()) {   }
-        System.out.println("Все самолеты взлетели");
+}
+
+public class Main {
+
+    public static void main(String[] args) throws InterruptedException {
+        
+        ProcessingThread pt = new ProcessingThread();
+        Thread t1 = new Thread(pt, "t1");
+        t1.start();
+        Thread t2 = new Thread(pt, "t2");
+        t2.start();
+        t1.join();
+        t2.join();
+        CounterObject.decrement();
+        System.out.println("Processing count=" + CounterObject.getCounter());
     }
 }
