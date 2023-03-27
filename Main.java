@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Main {
@@ -36,7 +37,7 @@ public class Main {
                 semaphore.release();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                System.err.print("Critical Thread Error");
+                System.err.println("Critical Thread Error");
             }
         }
     }
@@ -52,9 +53,15 @@ public class Main {
                 executor.execute(worker);
             }
             executor.shutdown();
-            while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)) { }
-            System.out.println("Все самолеты взлетели");
-
+            final boolean done = executor.awaitTermination(1, TimeUnit.MINUTES);//даем минуту на взлет всех самолетов
+            if (done)
+            {
+                System.out.println("Все самолеты взлетели");
+            }
+            else {
+                final List<Runnable> rejected = executor.shutdownNow();
+                System.out.println("Самолетов осталось на земле: " + rejected.size());
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.print("Critical Program Error");
